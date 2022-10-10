@@ -25,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
         return "Hello cashier, I will like to buy " + customer.getProductName() + ".";
     }
 
-    private void checkProductServiceException(Product product, Double walletBalance, int quantity) {
+    public void checkProductServiceException(Product product, Double walletBalance, int quantity) {
         if (product == null)
             throw new ProductServiceException(ErrorMessages.PRODUCT_NOT_AVAILABLE.getErrorMessage());
 
@@ -36,14 +36,14 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ProductServiceException(ErrorMessages.OUT_OF_STOCK.getErrorMessage());
     }
 
-    private void updateCustomerDetailsAndStoreProducts(Customer customer, Double walletBalance, Product product, int quantity) {
+    public void updateCustomerDetailsAndStoreProducts(Customer customer, Double walletBalance, Product product, int quantity) {
         var newWalletBalance = walletBalance - (product.getAmount() * quantity);
         customer.setWalletBalance(newWalletBalance);
         product.setQuantity(product.getQuantity() - quantity);
         if (product.getQuantity() == 0) product.setStock("OUT OF STOCK");
     }
 
-    private void updateProductBoughtList(Customer customer, int quantity, Product product) {
+    public void updateProductBoughtList(Customer customer, int quantity, Product product) {
         ProductBought productBought = new ProductBought(customer.getProductName(), quantity, product.getItemNo(), product.getAmount());
         var list = customer.getProductBoughtList();
         if (list == null) list = new ArrayList<>();
@@ -84,6 +84,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         return null;
     }
+
+
 
     @Override
     public int extractYear(String year) {

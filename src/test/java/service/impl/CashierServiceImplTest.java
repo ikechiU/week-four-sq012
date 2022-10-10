@@ -15,7 +15,7 @@ class CashierServiceImplTest {
     @BeforeEach
     public void init() {
         cashierService = new CashierServiceImpl();
-        customer = new Customer("Kendrick", "Female", 19);
+        customer = new Customer("Kendrick", "Female", 19, 20000.0);
         customer.setProductName("Rice");
         cashier = new Cashier();
         cashier.setCustomer(customer);

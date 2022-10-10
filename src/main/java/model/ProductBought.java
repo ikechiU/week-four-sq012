@@ -17,6 +17,9 @@ public class ProductBought {
         this.amount = amount;
     }
 
+    public ProductBought() {
+    }
+
     public String getProductName() {
         return productName;
     }

@@ -1,6 +1,7 @@
 import model.*;
 import service.impl.*;
 import model.Cart;
+import utils.CartComparator;
 import utils.Docs;
 import utils.Qualification;
 
@@ -8,25 +9,18 @@ import java.io.File;
 import java.util.*;
 
 public class Main {
-    private static final ArrayList<Product> products = new ArrayList<>();
 
     public static void main(String[] args) {
         File file = new File("src/main/resources/ProductsCSV.csv");
-
         var productList = Docs.readCSVUsingScanner(file);
         //var productList = Docs.readCSVUsingBufferedReader(file);
-        for (int i = 1; i < productList.size(); i++) {
-            String[] arrayProducts = productList.get(i);
-            System.out.println(Arrays.toString(arrayProducts));
-            products.add(new Product(arrayProducts[0], arrayProducts[1], Integer.parseInt(arrayProducts[2]), arrayProducts[3], arrayProducts[4], arrayProducts[5], arrayProducts[6], Double.parseDouble(arrayProducts[7])));
-        }
-
+        List<Product> products = Docs.getProducts(productList);
         storeActions(products);
     }
 
-    private static void storeActions(ArrayList<Product> products) {
-        Queue<String> customerQueue = new LinkedList<>();
-        Queue<Cart> priorityQueue = new PriorityQueue<>();
+    private static void storeActions(List<Product> products) {
+        Queue<String> customerQueue = new PriorityQueue<>();
+        Queue<Cart> priorityQueue = new PriorityQueue<>(new CartComparator());
         ProductsDBImpl productsDB = new ProductsDBImpl();
         productsDB.setProducts(products);
 
@@ -58,7 +52,7 @@ public class Main {
         String cashierSellResult = cashierService.sell(cashier, customer.getProductName());
         System.out.println(cashierSellResult + "\n");
         //First Customer Buy Product 2
-        String customerBuyResult2 = customerService.buy(customer, "BEANS", storeProducts, 3);
+        String customerBuyResult2 = customerService.buy(customer, "BEANS", storeProducts, 4);
         System.out.println(customerBuyResult2);
         cashier.setCustomer(customer);
         String cashierSellResult2 = cashierService.sell(cashier, customer.getProductName());
@@ -66,9 +60,8 @@ public class Main {
         //First Customer Product added to Cart
         Cart customerCart = new Cart(customer.getProductBoughtList(), customer.getId(), customer.getName());
 
-
         //Second Customer Buy Product 1
-        String customer1BuyResult = customerService.buy(customer1, "RICE", 2022, storeProducts, 2);
+        String customer1BuyResult = customerService.buy(customer1, "RICE", 2022, storeProducts, 3);
         System.out.println(customer1BuyResult);
         cashier2.setCustomer(customer1);
         String cashier1SellResult = cashierService.sell(cashier2, customer1.getProductName());
@@ -98,9 +91,17 @@ public class Main {
 
         priorityQueue.add(customerCart);
         customerQueue.add(customer.getName());
-        
-        System.out.println("\n\n" + priorityQueue);
-        System.out.println("\n" + customerQueue);
+
+        System.out.println("\n" + priorityQueue);
+        while (!priorityQueue.isEmpty()) {
+            System.out.println(priorityQueue.poll());
+        }
+        System.out.println("");
+        System.out.println(customerQueue);
+        while (!customerQueue.isEmpty()) {
+            System.out.println(customerQueue.poll());
+        }
+
     }
 
     public static void buyExceptions1(CustomerServiceImpl customerService, Customer customer2, Store storeProducts) {

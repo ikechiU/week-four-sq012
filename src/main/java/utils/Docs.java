@@ -2,6 +2,7 @@ package utils;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import model.Product;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -12,10 +13,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 public class Docs {
+
+    public static List<Product> getProducts(List<String[]> productList) {
+        List<Product> products = new ArrayList<>();
+        for (int i = 1; i < productList.size(); i++) {
+            String[] arrayProducts = productList.get(i);
+            //System.out.println(Arrays.toString(arrayProducts));
+            products.add(new Product(arrayProducts[0], arrayProducts[1], Integer.parseInt(arrayProducts[2]), arrayProducts[3], arrayProducts[4], arrayProducts[5], arrayProducts[6], Double.parseDouble(arrayProducts[7])));
+        }
+        return products;
+    }
 
     public static List<String[]> readCSVUsingScanner(File csvFile) {
         List<String[]> returnValue = new ArrayList<>();

@@ -49,6 +49,21 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void checkProductServiceException() {
+
+    }
+
+    @Test
+    void updateCustomerDetailsAndStoreProducts() {
+
+    }
+
+    @Test
+    void updateProductBoughtList() {
+
+    }
+
+    @Test
     void buyProductYearExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
                 customerService.buy(customer2, "rIcE", 2033, storeProducts, 1),
