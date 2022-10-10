@@ -28,14 +28,14 @@ class CustomerServiceImplTest {
         product1 = storeProducts.getProducts().get(1);
         product2 = storeProducts.getProducts().get(2);
         customerService = new CustomerServiceImpl();
-        customer = new Customer("Henry", "Male", 43);
-        customer2 = new Customer("Angela", "Female", 21);
+        customer = new Customer("Henry", "Male", 43, 2000.0);
+        customer2 = new Customer("Angela", "Female", 21, 3500.0);
     }
 
     @Test
     void buy() {
-        String result = customerService.buy(customer, "BeAnS", storeProducts);
-        String result1 = customerService.buy(customer2, "rIcE", storeProducts);
+        String result = customerService.buy(customer, "BeAnS", storeProducts, 1);
+        String result1 = customerService.buy(customer2, "rIcE", storeProducts, 1);
 
         assertEquals(result, "Hello cashier, I will like to buy " + customer.getProductName() + ".");
         assertEquals(result1, "Hello cashier, I will like to buy " + customer2.getProductName() + ".");
@@ -43,7 +43,7 @@ class CustomerServiceImplTest {
 
     @Test
     void BuyOverLoaded() {
-        String result = customerService.buy(customer, "BeAnS", 2022, storeProducts);
+        String result = customerService.buy(customer, "BeAnS", 2022, storeProducts, 1);
         assertEquals(result,
                 "Hello cashier, I will like to buy " + customer.getProductName() + ". That was manufactured in " + customer.getProductYear() +".");
     }
@@ -51,7 +51,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductYearExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                customerService.buy(customer2, "rIcE", 2033, storeProducts),
+                customerService.buy(customer2, "rIcE", 2033, storeProducts, 1),
                 ErrorMessages.MANUFACTURE_YEAR_LESS.name());
 
         assertTrue(thrown.getMessage().contains("Product manufacture year lesser than your request."));
@@ -60,7 +60,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductOutOfStockExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                        customerService.buy(customer2, "Fanta", 2022, storeProducts),
+                        customerService.buy(customer2, "Fanta", 2022, storeProducts, 1),
                 ErrorMessages.OUT_OF_STOCK.name());
 
         assertTrue(thrown.getMessage().contains("Product out of stock."));
@@ -69,7 +69,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductNotAvailableExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                        customerService.buy(customer2, "Suya", 2022, storeProducts),
+                        customerService.buy(customer2, "Suya", 2022, storeProducts, 1),
                 ErrorMessages.PRODUCT_NOT_AVAILABLE.name());
 
         assertTrue(thrown.getMessage().contains("Product not available."));

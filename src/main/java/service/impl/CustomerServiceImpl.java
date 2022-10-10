@@ -4,39 +4,67 @@ import exception.ErrorMessages;
 import exception.ProductServiceException;
 import model.Customer;
 import model.Product;
+import model.ProductBought;
 import model.Store;
 import service.CustomerService;
+
+import java.util.ArrayList;
 
 public class CustomerServiceImpl implements CustomerService {
 
     @Override
-    public String buy(Customer customer, String productName, Store storeProducts) {
+    public String buy(Customer customer, String productName, Store storeProducts, int quantity) {
         customer.setProductName(confirmProductName(productName));
+        Double walletBalance = customer.getWalletBalance();
 
         Product product = getProduct(storeProducts, customer.getProductName());
-        if (product == null)
-            throw new ProductServiceException(ErrorMessages.PRODUCT_NOT_AVAILABLE.getErrorMessage());
-
-        if (product.getCategory().equals("OUT OF STOCK"))
-            throw new ProductServiceException(ErrorMessages.OUT_OF_STOCK.getErrorMessage());
+        checkProductServiceException(product, walletBalance, quantity);
+        updateCustomerDetailsAndStoreProducts(customer, walletBalance, product, quantity);
+        updateProductBoughtList(customer, quantity, product);
 
         return "Hello cashier, I will like to buy " + customer.getProductName() + ".";
     }
 
-    @Override
-    public String buy(Customer customer, String productName, int year, Store storeProducts) {
-        customer.setProductName(confirmProductName(productName));
-
-        Product product = getProduct(storeProducts, customer.getProductName());
+    private void checkProductServiceException(Product product, Double walletBalance, int quantity) {
         if (product == null)
             throw new ProductServiceException(ErrorMessages.PRODUCT_NOT_AVAILABLE.getErrorMessage());
 
-        if (product.getQuantity().equals("OUT OF STOCK"))
+        if (walletBalance < (product.getAmount() * quantity))
+            throw new ProductServiceException(ErrorMessages.INSUFFICIENT_BALANCE.getErrorMessage());
+
+        if (product.getQuantity() < quantity)
             throw new ProductServiceException(ErrorMessages.OUT_OF_STOCK.getErrorMessage());
+    }
+
+    private void updateCustomerDetailsAndStoreProducts(Customer customer, Double walletBalance, Product product, int quantity) {
+        var newWalletBalance = walletBalance - (product.getAmount() * quantity);
+        customer.setWalletBalance(newWalletBalance);
+        product.setQuantity(product.getQuantity() - quantity);
+        if (product.getQuantity() == 0) product.setStock("OUT OF STOCK");
+    }
+
+    private void updateProductBoughtList(Customer customer, int quantity, Product product) {
+        ProductBought productBought = new ProductBought(customer.getProductName(), quantity, product.getItemNo(), product.getAmount());
+        var list = customer.getProductBoughtList();
+        if (list == null) list = new ArrayList<>();
+        list.add(productBought);
+        customer.setProductBoughtList(list);
+    }
+
+    @Override
+    public String buy(Customer customer, String productName, int year, Store storeProducts, int quantity) {
+        customer.setProductName(confirmProductName(productName));
+        Double walletBalance = customer.getWalletBalance();
+
+        Product product = getProduct(storeProducts, customer.getProductName());
+        checkProductServiceException(product, walletBalance, quantity);
 
         customer.setProductYear(year);
         if (customer.getProductYear() > extractYear(product.getManufactureDate()))
             throw new ProductServiceException(ErrorMessages.MANUFACTURE_YEAR_LESS.getErrorMessage());
+
+        updateCustomerDetailsAndStoreProducts(customer, walletBalance, product, quantity);
+        updateProductBoughtList(customer, quantity, product);
 
         return "Hello cashier, I will like to buy " + customer.getProductName() + ". That was manufactured in " + customer.getProductYear() +".";
     }
