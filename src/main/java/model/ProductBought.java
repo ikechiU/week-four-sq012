@@ -1,14 +1,10 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ProductBought {
     private String productName;
     private Integer quantity;
     private String itemNo;
     private Double amount;
-    private List<ProductBought> productBoughtList = null;
 
     public ProductBought(String productName, Integer quantity, String itemNo, Double amount) {
         this.productName = productName;
@@ -52,12 +48,5 @@ public class ProductBought {
         this.amount = amount;
     }
 
-    public List<ProductBought> getProductBoughtList() {
-        return productBoughtList;
-    }
-
-    public void add(ProductBought productBought) {
-        productBoughtList.add(productBought);
-    }
 }
 

@@ -11,10 +11,11 @@ import service.CustomerService;
 import java.util.ArrayList;
 
 public class CustomerServiceImpl implements CustomerService {
+    private static int customerId = 324;
 
     @Override
     public String buy(Customer customer, String productName, Store storeProducts, int quantity) {
-        customer.setProductName(confirmProductName(productName));
+        setCustomerDetails(customer, productName);
         Double walletBalance = customer.getWalletBalance();
 
         Product product = getProduct(storeProducts, customer.getProductName());
@@ -23,6 +24,14 @@ public class CustomerServiceImpl implements CustomerService {
         updateProductBoughtList(customer, quantity, product);
 
         return "Hello cashier, I will like to buy " + customer.getProductName() + ".";
+    }
+
+    private void setCustomerDetails(Customer customer, String productName) {
+        if (customer.getId() == null || customer.getId().isBlank()) {
+            customer.setId("Cus" + customerId);
+            customerId++;
+        }
+        customer.setProductName(confirmProductName(productName));
     }
 
     public void checkProductServiceException(Product product, Double walletBalance, int quantity) {
@@ -53,7 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String buy(Customer customer, String productName, int year, Store storeProducts, int quantity) {
-        customer.setProductName(confirmProductName(productName));
+        setCustomerDetails(customer, productName);
         Double walletBalance = customer.getWalletBalance();
 
         Product product = getProduct(storeProducts, customer.getProductName());

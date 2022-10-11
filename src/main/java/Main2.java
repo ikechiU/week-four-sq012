@@ -1,5 +1,6 @@
 import model.*;
 import service.impl.*;
+import utils.CartPriorityComparator;
 import utils.Docs;
 import utils.FileChooser;
 import utils.Qualification;
@@ -10,6 +11,8 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Main2 extends FileChooser {
     private final JFileChooser jFileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -74,19 +77,23 @@ public class Main2 extends FileChooser {
     }
 
     private void storeActions(ArrayList<Product> products) {
+        Queue<String> customerQueue = new PriorityQueue<>();
+        PriorityQueue<Cart> priorityQueue = new PriorityQueue<>(new CartPriorityComparator());
         ProductsDBImpl productsDB = new ProductsDBImpl();
         productsDB.setProducts(products);
 
         Manager manager = new Manager("Michael", "Male", 32, 1);
         Applicant applicant = new Applicant("Doris", "Female", 25, Qualification.SSCE.name());
         Applicant applicant1 = new Applicant("Smith", "Male", 28, Qualification.BSC.name());
-        Staff cashier = new Cashier("Doris", "Female", 25, 2); //Polymorphism
-        Customer customer = new Customer("Henry", "Male", 43, 2000.0);
-        Customer customer3 = new Customer("Agatha", "Female", 30, 3000.0);
+        Cashier cashier = new Cashier("Doris", "Female", 25, 2); //Polymorphism
+        Customer customer = new Customer("Henry", "Male", 43, 2111800.0);
+        Customer customer1 = new Customer("Yinka", "Male", 43, 25000.0);
+        Customer customer3 = new Customer("Agatha", "Female", 30, 11500.0);
 
         ManagerServiceImpl managerService = new ManagerServiceImpl();
         CashierServiceImpl cashierService = new CashierServiceImpl();
         CustomerServiceImpl customerService = new CustomerServiceImpl();
+        CartServiceImpl cart = new CartServiceImpl();
         StoreDBImpl storeDB = new StoreDBImpl();
 
         Store storeProducts = storeDB.getStoreProducts(productsDB);
@@ -97,23 +104,58 @@ public class Main2 extends FileChooser {
 
         Cashier cashier2 = managerService.hireCashier(applicant1, manager);
 
-        String customerBuyResult = customerService.buy(customer, "RICE", storeProducts, 1);
+        //First Customer Buy Product 1
+        String customerBuyResult = customerService.buy(customer, "RICE", storeProducts, 16);
         System.out.println(customerBuyResult);
-
-        ((Cashier) cashier).setCustomer(customer);
-        String cashierSellResult = cashierService.sell((Cashier) cashier, customer.getProductName());
+        String cashierSellResult = cashierService.priorityQueueSell(cashier, priorityQueue);
         System.out.println(cashierSellResult + "\n");
+        //First Customer Buy Product 2
+        String customerBuyResult2 = customerService.buy(customer, "BEANS", storeProducts, 4);
+        System.out.println(customerBuyResult2);
+        String cashierSellResult2 = cashierService.priorityQueueSell(cashier, priorityQueue);
+        System.out.println(cashierSellResult2 + "\n");
+        //First Customer Product added to Cart
+        Cart customerCart = cart.createCart(customer.getProductBoughtList(), customer.getId(), customer.getName());
 
-        String customer3BuyResult = customerService.buy(customer3, "RICE", 2022, storeProducts, 1);
+        //Second Customer Buy Product 1
+        String customer1BuyResult = customerService.buy(customer1, "RICE", 2022, storeProducts, 3);
+        System.out.println(customer1BuyResult);
+        String cashier1SellResult = cashierService.priorityQueueSell(cashier2, priorityQueue);
+        System.out.println(cashier1SellResult + "\n");
+        //Second Customer Product added to Cart
+        Cart customerCart1 = cart.createCart(customer1.getProductBoughtList(), customer1.getId(), customer1.getName());
+        priorityQueue.add(customerCart1);
+        customerQueue.add(customer1.getName());
+
+        //Third Customer Buy Product 1
+        String customer3BuyResult = customerService.buy(customer3, "Cod", 2022, storeProducts, 1);
         System.out.println(customer3BuyResult);
-
-        assert cashier2 != null;
-        cashier2.setCustomer(customer3);
-        String cashier3SellResult = cashierService.sell(cashier2, customer3.getProductName());
+        String cashier3SellResult = cashierService.priorityQueueSell(cashier2, priorityQueue);
         System.out.println(cashier3SellResult + "\n");
+        //Third Customer Product added to Cart
+        Cart customerCart3 = cart.createCart(customer3.getProductBoughtList(), customer3.getId(), customer3.getName());
+        priorityQueue.add(customerCart3);
+        customerQueue.add(customer3.getName());
 
-        Customer customer2 = new Customer("Angela", "Female", 21, 2000.0);
-        Customer customer4 = new Customer("Herschel", "Male", 50, 2000.0);
+        //Customers buying products that throws exception
+        Customer customer2 = new Customer("Angela", "Female", 21, 1000.0);
+        Customer customer4 = new Customer("Herschel", "Male", 50, 10000.0);
+
+        //buyExceptions1(customerService, customer2, storeProducts);
+        //buyExceptions2(customerService, customer4, storeProducts);
+
+        priorityQueue.add(customerCart);
+        customerQueue.add(customer.getName());
+
+        System.out.println("\n" + priorityQueue);
+        while (!priorityQueue.isEmpty()) {
+            System.out.println(priorityQueue.poll());
+        }
+        System.out.println("");
+        System.out.println(customerQueue);
+        while (!customerQueue.isEmpty()) {
+            System.out.println(customerQueue.poll());
+        }
 
         //buyExceptions1(customerService, customer2, storeProducts);
         //buyExceptions2(customerService, customer4, storeProducts);

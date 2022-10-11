@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.TestProductImplDB;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerServiceImplTest {
@@ -33,6 +35,12 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void checkCustomerId() {
+        customerService.buy(customer, "BeAnS", storeProducts, 1);
+        assertEquals("Cus" + 324, customer.getId());
+    }
+
+    @Test
     void buy() {
         String result = customerService.buy(customer, "BeAnS", storeProducts, 1);
         String result1 = customerService.buy(customer2, "rIcE", storeProducts, 1);
@@ -49,19 +57,47 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void checkProductServiceException() {
+    void updateCustomerDetails() {
+        customerService.buy(customer, "BeAnS", storeProducts, 1);
+        customerService.buy(customer2, "rIcE", storeProducts, 1);
+
+        var newCustomerBalance = customer.getWalletBalance();
+        var newCustomer2Balance = customer2.getWalletBalance();
+
+        assertEquals(newCustomerBalance, 2000.0 - 1300);
+        assertEquals(newCustomer2Balance, 3500.0 - 1500);
 
     }
 
     @Test
-    void updateCustomerDetailsAndStoreProducts() {
+    void updateStoreProducts() {
+        customerService.buy(customer, "BeAnS", storeProducts, 1);
+        customerService.buy(customer2, "rIcE", storeProducts, 1);
 
+        var riceStockQty = storeProducts.getProducts().get(0).getQuantity();
+        var beansStockQty = storeProducts.getProducts().get(0).getQuantity();
+
+        assertEquals(riceStockQty, 19);
+        assertEquals(beansStockQty, 19);
     }
 
     @Test
     void updateProductBoughtList() {
+        customerService.buy(customer2, "BeAnS", storeProducts, 1);
+        customerService.buy(customer2, "rIcE", storeProducts, 1);
 
+        var list = customer2.getProductBoughtList();
+        assertEquals(list.size(), 2);
     }
+
+    @Test
+    void buyProductInsufficientFundTesting() {
+        ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
+                customerService.buy(customer, "rice", storeProducts, 5),
+                ErrorMessages.INSUFFICIENT_BALANCE.name());
+        assertTrue(thrown.getMessage().contains("Insufficient balance."));
+    }
+
 
     @Test
     void buyProductYearExceptionTesting() {

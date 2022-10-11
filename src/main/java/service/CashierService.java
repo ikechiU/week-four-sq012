@@ -1,9 +1,13 @@
 package service;
 
-import model.Cashier;
-import model.Store;
-import model.Product;
+import model.*;
+
+import java.util.List;
+import java.util.PriorityQueue;
 
 public interface CashierService {
-    String sell(Cashier cashier, String productName); //Abstraction
+    String priorityQueueSell(Cashier cashier, PriorityQueue<Cart> queue);
+    String normalQueueSell(Cashier cashier, PriorityQueue<Cart> queue);
+    String getListOfProductBought(List<ProductBought> productBoughtList);
+    String receipt(String customerName, List<ProductBought> productBoughtList, String receipt, int totalQty, int totalAmount, String cashier);
 }
