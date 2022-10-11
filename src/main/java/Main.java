@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.*;
 
 public class Main {
-    private  static final Queue<String> customerQueue = new PriorityQueue<>();
+    private  static final Queue<String> customerQueue = new LinkedList<>();
     private  static final PriorityQueue<Cart> priorityQueue = new PriorityQueue<>(new CartPriorityComparator());
     private  static final Manager manager = new Manager("Michael", "Male", 32, 1);
     private  static final Applicant applicant = new Applicant("Doris", "Female", 25, Qualification.SSCE.name());
@@ -77,7 +77,6 @@ public class Main {
         while (!customerQueue.isEmpty()) {
             System.out.println(customerQueue.poll());
         }
-
 
         //Customers buying products that throws exception
         Customer customer2 = new Customer("Angela", "Female", 21, 1000.0);

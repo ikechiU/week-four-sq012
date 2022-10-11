@@ -35,12 +35,6 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void checkCustomerId() {
-        customerService.buy(customer, "BeAnS", storeProducts, 1);
-        assertEquals("Cus" + 324, customer.getId());
-    }
-
-    @Test
     void buy() {
         String result = customerService.buy(customer, "BeAnS", storeProducts, 1);
         String result1 = customerService.buy(customer2, "rIcE", storeProducts, 1);

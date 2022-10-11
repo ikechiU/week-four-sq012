@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.TestProductImplDB;
-import utils.CartNormalComparator;
 import utils.CartPriorityComparator;
 
 import java.util.LinkedList;
@@ -24,7 +23,7 @@ class CashierServiceImplTest {
     Customer customer3;
     Cashier cashier;
     PriorityQueue<Cart> priorityQueue = new PriorityQueue<>(new CartPriorityComparator());
-    PriorityQueue<Cart> normalQueue = new PriorityQueue<>(new CartNormalComparator());
+    Queue<Cart> normalQueue = new LinkedList<>();
 
     @BeforeEach
     public void init() {
@@ -64,16 +63,26 @@ class CashierServiceImplTest {
     }
 
     @Test
+    void priorityQueueSize() {
+        Assertions.assertEquals(3, priorityQueue.size());
+    }
+
+    @Test
+    void normalQueueSize() {
+        Assertions.assertEquals(3, priorityQueue.size());
+    }
+
+    @Test
     void priorityQueueSell() {
         var actual = cashierService.priorityQueueSell(cashier, priorityQueue);
         Assertions.assertEquals(priorityQueueResult(), actual);
     }
 
-//    @Test
-//    void normalQueueSell() {
-//        var actual = cashierService.normalQueueSell(cashier, normalQueue);
-//        Assertions.assertEquals(priorityQueueResult(), actual);
-//    }
+    @Test
+    void normalQueueSell() {
+        var actual = cashierService.normalQueueSell(cashier, normalQueue);
+        Assertions.assertEquals(normalQueueResult(), actual);
+    }
 
     @Test
     void getListOfProductBoughtTest() {
@@ -96,12 +105,12 @@ class CashierServiceImplTest {
 
     public String normalQueueResult() {
         StringBuilder sb = new StringBuilder();
-        sb.append(mockReceipt("Yinka", "Rice, Beans, Spaghetti, Chicken, Coke",
-                        "110984235", 18, 28900, "Ikechi")).append("\n")
-                .append(mockReceipt("Kendrick", "Rice, Salmon, Spaghetti",
-                        "110984236", 10, 19000, "Ikechi")).append("\n")
+        sb.append(mockReceipt("Kendrick", "Rice, Salmon, Spaghetti",
+                        "120984235", 10, 19000, "Ikechi")).append("\n")
+                .append(mockReceipt("Yinka", "Rice, Beans, Spaghetti, Chicken, Coke",
+                        "120984236", 18, 28900, "Ikechi")).append("\n")
                 .append(mockReceipt("Michael", "Detergent, Toothpaste, Chips, Grapes",
-                        "110984237", 4, 8000, "Ikechi")).append("\n");
+                        "120984237", 4, 8000, "Ikechi")).append("\n");
         return sb.toString();
     }
 
