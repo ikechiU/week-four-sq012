@@ -9,13 +9,17 @@ import model.Store;
 import service.CustomerService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CustomerServiceImpl implements CustomerService {
     private static int customerId = 324;
 
     @Override
     public String buy(Customer customer, String productName, Store storeProducts, int quantity) {
-        setCustomerDetails(customer, productName);
+        setCustomerDetails(customer);
+        customer.setProductName(confirmProductName(productName));
         Double walletBalance = customer.getWalletBalance();
 
         Product product = getProduct(storeProducts, customer.getProductName());
@@ -26,12 +30,33 @@ public class CustomerServiceImpl implements CustomerService {
         return "Hello cashier, I will like to buy " + customer.getProductName() + ".";
     }
 
-    private void setCustomerDetails(Customer customer, String productName) {
+    @Override
+    public String buy(Customer customer, HashMap<String, Integer> productNames, Store storeProducts) {
+        setCustomerDetails(customer);
+        Double walletBalance = customer.getWalletBalance();
+
+        for (Map.Entry<String, Integer> map : productNames.entrySet()) {
+            var productName = map.getKey();
+            var qty = map.getValue();
+            Product product = getProduct(storeProducts, productName);
+            checkProductServiceException(product, walletBalance, qty);
+            updateCustomerDetailsAndStoreProducts(customer, walletBalance, product, qty);
+            updateProductBoughtList(customer, productName, qty, product);
+        }
+
+        if (productNames.size() == 1)
+            return "Hello cashier, I will like to buy " +  + customer.getProductBoughtList().size() + " product.";
+        else if (productNames.size() > 1)
+            return "Hello cashier, I will like to buy " +  + customer.getProductBoughtList().size() + " products.";
+        else
+            return null;
+    }
+
+    private void setCustomerDetails(Customer customer) {
         if (customer.getId() == null || customer.getId().isBlank()) {
             customer.setId("Cus" + customerId);
             customerId++;
         }
-        customer.setProductName(confirmProductName(productName));
     }
 
     public void checkProductServiceException(Product product, Double walletBalance, int quantity) {
@@ -60,9 +85,18 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setProductBoughtList(list);
     }
 
+    public void updateProductBoughtList(Customer customer, String productName, int quantity, Product product) {
+        ProductBought productBought = new ProductBought(productName, quantity, product.getItemNo(), product.getAmount());
+        var list = customer.getProductBoughtList();
+        if (list == null) list = new ArrayList<>();
+        list.add(productBought);
+        customer.setProductBoughtList(list);
+    }
+
     @Override
     public String buy(Customer customer, String productName, int year, Store storeProducts, int quantity) {
-        setCustomerDetails(customer, productName);
+        setCustomerDetails(customer);
+        customer.setProductName(confirmProductName(productName));
         Double walletBalance = customer.getWalletBalance();
 
         Product product = getProduct(storeProducts, customer.getProductName());

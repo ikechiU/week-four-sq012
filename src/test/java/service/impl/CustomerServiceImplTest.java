@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import service.TestProductImplDB;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,6 +22,9 @@ class CustomerServiceImplTest {
     CustomerServiceImpl customerService;
     Customer customer;
     Customer customer2;
+    HashMap<String, Integer> customerProductList = new HashMap<>();
+    HashMap<String, Integer> customerProductList2 = new HashMap<>();
+    HashMap<String, Integer> customerProductList3 = new HashMap<>();
 
     @BeforeEach
     void init() {
@@ -32,10 +36,17 @@ class CustomerServiceImplTest {
         customerService = new CustomerServiceImpl();
         customer = new Customer("Henry", "Male", 43, 2000.0);
         customer2 = new Customer("Angela", "Female", 21, 3500.0);
+
+        customerProductList2.put("Rice", 1);
+        customerProductList2.put("Beans", 1);
+        customerProductList2.put("Pasta", 1);
+        customerProductList2.put("Jam", 1);
+
+        customerProductList3.put("Coffee", 1);
     }
 
     @Test
-    void buy() {
+    void buyProduct() {
         String result = customerService.buy(customer, "BeAnS", storeProducts, 1);
         String result1 = customerService.buy(customer2, "rIcE", storeProducts, 1);
 
@@ -44,7 +55,17 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void BuyOverLoaded() {
+    void buyProducts() {
+        var result = customerService.buy(customer, customerProductList2, storeProducts);
+        var result2 = customerService.buy(customer2, customerProductList3, storeProducts);
+
+        assertNull(customerService.buy(new Customer(), customerProductList, storeProducts));
+        assertEquals("Hello cashier, I will like to buy 4 products.", result);
+        assertEquals("Hello cashier, I will like to buy 1 product.", result2);
+    }
+
+    @Test
+    void buyProductWithManufactureYear() {
         String result = customerService.buy(customer, "BeAnS", 2022, storeProducts, 1);
         assertEquals(result,
                 "Hello cashier, I will like to buy " + customer.getProductName() + ". That was manufactured in " + customer.getProductYear() +".");
@@ -169,5 +190,6 @@ class CustomerServiceImplTest {
         }
         assertEquals("2022", String.valueOf(customerService.extractYear(year3)));
     }
+
 
 }
