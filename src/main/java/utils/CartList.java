@@ -11,17 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CartList {
-    private static final Customer customer = new Customer("Henry", "Male", 43, 2111800.0);
-    private static final Customer customer1 = new Customer("Yinka", "Male", 43, 250000.0);
-    private static final Customer customer2 = new Customer("Agnes", "Female", 20, 2500000.0);
-    private static final Customer customer3 = new Customer("Agatha", "Female", 30, 110500.0);
-    private static final Customer customer4 = new Customer("Ben", "Male", 31, 905000.0);
-    private static final Customer customer5 = new Customer("Jim", "Male", 32, 900000.0);
-    private static final Customer customer6 = new Customer("Simi", "Female", 32, 800000.0);
-    private static final Customer customer7 = new Customer("Anne", "Female", 39, 850000.0);
-    private static final Customer customer8 = new Customer("Sam", "Male", 79, 550000.0);
-    private static final Customer customer9 = new Customer("Nwachukwu", "Male", 89, 650000.0);
-    private static final Customer customer10 = new Customer("Joy", "Female", 49, 750000.0);
+    private final Customer customer = new Customer("Henry", "Male", 43, 2111800.0);
+    private final Customer customer1 = new Customer("Yinka", "Male", 43, 250000.0);
+    private final Customer customer2 = new Customer("Agnes", "Female", 20, 2500000.0);
+    private final Customer customer3 = new Customer("Agatha", "Female", 30, 110500.0);
+    private final Customer customer4 = new Customer("Ben", "Male", 31, 905000.0);
+    private final Customer customer5 = new Customer("Jim", "Male", 32, 900000.0);
+    private final Customer customer6 = new Customer("Simi", "Female", 32, 800000.0);
+    private final Customer customer7 = new Customer("Anne", "Female", 39, 850000.0);
+    private final Customer customer8 = new Customer("Sam", "Male", 79, 550000.0);
+    private final Customer customer9 = new Customer("Nwachukwu", "Male", 89, 650000.0);
+    private final Customer customer10 = new Customer("Joy", "Female", 49, 750000.0);
 
     public List<Cart> getCarts(CustomerServiceImpl customerService, CartServiceImpl cart, Store storeProducts) {
         HashMap<String, Integer> customerProductList = new HashMap<>();

@@ -12,6 +12,8 @@ public interface CashierService {
     Set<String> asyncGetProductsSold(Cashier cashier, List<Cart> carts);
     Map<String, Integer> asyncGetMapOfProductsSold(Cashier cashier, List<Cart> carts);
     Sales asyncSell(Cashier cashier, List<Cart> carts);
+    Sales nonAsyncSell(Cashier cashier, List<Cart> carts);
+    Sales nonAsyncExecutorsSell(Cashier cashier, List<Cart> carts);
     String priorityQueueSell(Cashier cashier, Queue<Cart> queue);
     String normalQueueSell(Cashier cashier, Queue<Cart> queue);
     String getListOfProductBought(List<ProductBought> productBoughtList);

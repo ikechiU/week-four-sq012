@@ -3,12 +3,12 @@ package service.impl;
 import model.Applicant;
 import model.Cashier;
 import model.Manager;
-import model.Staff;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.Qualification;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ManagerServiceImplTest {
     Applicant applicant;
