@@ -10,10 +10,12 @@ public class Cashier extends Staff { //Inheritance Staff Class
     private final Collection<String> customerNames = Collections.synchronizedCollection(new ArrayList<>());
     private final Set<String> productsSold = Collections.synchronizedSet(new HashSet<>());
     private final Map<String, Integer> productsSoldMap = Collections.synchronizedMap(new HashMap<>());
+    private final Object productSoldMapObjectLock = new Object();
     private final LongAdder totalQuantities = new LongAdder();
     private final AtomicInteger totalSales = new AtomicInteger();
     private int specificProductTotal;
-    private final Object synchronizedTotalQties = new Object();
+    private final Object totalQtiesObjectLock = new Object();
+
     private Sales sales;
 
     public Cashier(String name, String sex, int age, int id) {
@@ -45,7 +47,10 @@ public class Cashier extends Staff { //Inheritance Staff Class
     }
 
     public void addProductsSold(String product) {
-        productsSold.add(product);
+        synchronized (productSoldMapObjectLock) {
+            productsSold.add(product);
+        }
+
     }
 
     public Map<String, Integer> getProductsSoldMap() {
@@ -82,7 +87,7 @@ public class Cashier extends Staff { //Inheritance Staff Class
 
     public void addSpecificProductTotal(String specificProductName, String productName, int qty) {
         if (specificProductName.equals(productName)) {
-            synchronized (synchronizedTotalQties) {
+            synchronized (totalQtiesObjectLock) {
                 this.specificProductTotal += qty;
             }
         }
