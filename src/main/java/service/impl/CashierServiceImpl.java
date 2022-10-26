@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.function.BinaryOperator;
+import java.util.stream.Stream;
 
 public class CashierServiceImpl implements CashierService {
 
@@ -20,13 +22,21 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Integer asyncGetQuantitiesOfOneProductSold(Cashier cashier, List<Cart> carts, String specificProductName) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
-                for (ProductBought product: cart.getProductBoughtList()) {
-                    String productName = product.getProductName();
-                    cashier.addSpecificProductTotal(specificProductName, productName, product.getQuantity());
-                }
+            carts.stream().forEach(cart -> {
+               cart.getProductBoughtList().stream().forEach(product -> {
+                   String productName = product.getProductName();
+                   cashier.addSpecificProductTotal(specificProductName, productName, product.getQuantity());
+               });
                 issueReceipt(cashier, cart);
-            }
+            });
+
+//            for (Cart cart : carts) {
+//                for (ProductBought product : cart.getProductBoughtList()) {
+//                    String productName = product.getProductName();
+//                    cashier.addSpecificProductTotal(specificProductName, productName, product.getQuantity());
+//                }
+//                issueReceipt(cashier, cart);
+//            }
             return cashier.getSpecificProductTotal();
         });
         try {
@@ -39,7 +49,7 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Integer asyncGetQuantitiesSold(Cashier cashier, List<Cart> carts) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
+            for (Cart cart : carts) {
                 var totalQty = cart.getTotalQty();
                 cashier.addTotalQuantities(totalQty);
                 issueReceipt(cashier, cart);
@@ -56,7 +66,7 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Integer asyncGetAmountSold(Cashier cashier, List<Cart> carts) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
+            for (Cart cart : carts) {
                 var totalAmount = cart.getTotalAmount();
                 cashier.addTotalSale(totalAmount);
                 issueReceipt(cashier, cart);
@@ -73,7 +83,7 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Collection<String> asyncGetCustomerNames(Cashier cashier, List<Cart> carts) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
+            for (Cart cart : carts) {
                 var customerName = cart.getCustomerName();
                 cashier.addCustomerName(customerName);
                 issueReceipt(cashier, cart);
@@ -90,8 +100,8 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Set<String> asyncGetProductsSold(Cashier cashier, List<Cart> carts) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
-                for (ProductBought productBought: cart.getProductBoughtList()) {
+            for (Cart cart : carts) {
+                for (ProductBought productBought : cart.getProductBoughtList()) {
                     cashier.addProductsSold(productBought.getProductName());
                 }
                 issueReceipt(cashier, cart);
@@ -108,8 +118,8 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Map<String, Integer> asyncGetMapOfProductsSold(Cashier cashier, List<Cart> carts) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
-                for (ProductBought productBought: cart.getProductBoughtList()) {
+            for (Cart cart : carts) {
+                for (ProductBought productBought : cart.getProductBoughtList()) {
                     var productName = productBought.getProductName();
                     var map = cashier.getProductsSoldMap();
                     int count = 0;
@@ -139,7 +149,7 @@ public class CashierServiceImpl implements CashierService {
         synchronized (newMonitorLock) {
             List<Customer> customersOrderSettled = new ArrayList<>();
 
-            for(Customer customer: updatedCustomers) {
+            for (Customer customer : updatedCustomers) {
                 var future = CompletableFuture.supplyAsync(() -> newSell(cashier, customer));
                 try {
                     customersOrderSettled.add(future.get());
@@ -166,13 +176,13 @@ public class CashierServiceImpl implements CashierService {
     public List<Customer> newNonAsyncSellThread(Cashier cashier, List<Customer> customers, Store storeProducts) {
         var updatedCustomers = getCustomersInCashierPOS(customers, storeProducts);
         List<Thread> threads = new ArrayList<>();
-        for(Customer customer: updatedCustomers) {
+        for (Customer customer : updatedCustomers) {
             Thread thread = new Thread(new NonAsync2(cashier, customer));
             threads.add(thread);
             thread.start();
         }
 
-        for(var thread : threads) {
+        for (var thread : threads) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
@@ -203,11 +213,11 @@ public class CashierServiceImpl implements CashierService {
     }
 
     private Customer newSell(Cashier cashier, Customer customer) {
-        for (Map.Entry<String, String> map: customer.getCartStatus().entrySet()) {
+        for (Map.Entry<String, String> map : customer.getCartStatus().entrySet()) {
             var productName = map.getKey();
             var status = map.getValue();
 
-            var ch  = status.charAt(0);
+            var ch = status.charAt(0);
             if (Character.isDigit(ch)) {
                 customer.addToPurchase(productName, Integer.parseInt(status));
             }
@@ -231,7 +241,7 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Sales asyncSell(Cashier cashier, List<Cart> carts) {
         var future = CompletableFuture.supplyAsync(() -> {
-            for (Cart cart: carts) {
+            for (Cart cart : carts) {
                 sellingPerCart(cashier, cart);
                 issueReceipt(cashier, cart);
             }
@@ -248,13 +258,13 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public Sales nonAsyncSell(Cashier cashier, List<Cart> carts) {
         ArrayList<Thread> threads = new ArrayList<>();
-        for (Cart cart: carts) {
+        for (Cart cart : carts) {
             Thread thread = new Thread(new NonAsync(cashier, cart));
             threads.add(thread);
             thread.start();
         }
 
-        for (Thread thread: threads) {
+        for (Thread thread : threads) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
@@ -269,7 +279,7 @@ public class CashierServiceImpl implements CashierService {
     public Sales nonAsyncExecutorsSell(Cashier cashier, List<Cart> carts) {
         var executorService = Executors.newFixedThreadPool(4);
         var future = executorService.submit(() -> {
-            for(Cart cart: carts) {
+            for (Cart cart : carts) {
                 sellingPerCart(cashier, cart);
             }
             return cashier;
@@ -277,7 +287,7 @@ public class CashierServiceImpl implements CashierService {
 
         Sales sales = null;
         try {
-            var returnedFuture  = future.get();
+            var returnedFuture = future.get();
             sales = new Sales(returnedFuture.getTotalSales(), returnedFuture.getProductsSold(), returnedFuture.getProductsSoldMap(), returnedFuture.getCustomerNames());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -329,14 +339,14 @@ public class CashierServiceImpl implements CashierService {
     }
 
     private int getQueueType(Queue<Cart> queue) {
-        if(queue.getClass().equals(PriorityQueue.class)) return priorityReceipt;
+        if (queue.getClass().equals(PriorityQueue.class)) return priorityReceipt;
         else return normalQueueReceipt;
     }
 
     @Override
     public String receipt(String customerName, List<ProductBought> productBoughtList, String receipt, int totalQty, int totalAmount, String cashier) {
         return "Cashier{" +
-                "message='" + " Thank you"  + '\'' +
+                "message='" + " Thank you" + '\'' +
                 ", customerName='" + customerName + '\'' +
                 ", product='" + getListOfProductBought(productBoughtList) + '\'' +
                 ", receipt='" + receipt + '\'' +
@@ -351,7 +361,7 @@ public class CashierServiceImpl implements CashierService {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < productBoughtList.size(); i++) {
             ProductBought productBought = productBoughtList.get(i);
-            if (i == productBoughtList.size() -1) stringBuilder.append(productBought.getProductName());
+            if (i == productBoughtList.size() - 1) stringBuilder.append(productBought.getProductName());
             else stringBuilder.append(productBought.getProductName()).append(", ");
         }
         return stringBuilder.toString();
@@ -377,10 +387,11 @@ public class CashierServiceImpl implements CashierService {
         }
     }
 
-    public static class NonAsync implements Runnable{
+    public static class NonAsync implements Runnable {
         private final Cashier cashier;
         private final Cart cart;
-        public NonAsync (Cashier cashier, Cart cart) {
+
+        public NonAsync(Cashier cashier, Cart cart) {
             this.cashier = cashier;
             this.cart = cart;
         }
@@ -392,10 +403,11 @@ public class CashierServiceImpl implements CashierService {
         }
     }
 
-    public static class NonAsync2 implements Runnable{
+    public static class NonAsync2 implements Runnable {
         private final Cashier cashier;
         private final Customer customer;
-        public NonAsync2 (Cashier cashier, Customer customer) {
+
+        public NonAsync2(Cashier cashier, Customer customer) {
             this.cashier = cashier;
             this.customer = customer;
         }

@@ -216,13 +216,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Product getProduct(Store storeProducts, String productName) {
-        for (Product product : storeProducts.getProducts()) {
-            if (product.getName().equals(productName)) {
-                return product;
-            }
-        }
-
-        return null;
+        return storeProducts.getProducts().parallelStream().filter(p -> p.getName().equals(productName)).findAny().orElse(null);
+//        for (Product product : storeProducts.getProducts()) {
+//            if (product.getName().equals(productName)) {
+//                return product;
+//            }
+//        }
+//
+//        return null;
     }
 
 
