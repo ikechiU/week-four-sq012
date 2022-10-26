@@ -3,29 +3,34 @@ package service.impl;
 import model.Cart;
 import model.Cashier;
 import model.Customer;
+import model.Store;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.TestProductImplDB;
 import utils.CartList;
 import utils.CartPriorityComparator;
+import utils.CustomersList;
 
 import java.util.*;
 
 class CashierServiceImplThreadTest {
+    TestProductImplDB productImplDB;
     CashierServiceImpl cashierService;
     List<Cart> carts;
     Cashier cashier;
+    List<Customer> customers;
 
     @BeforeEach
     public void init() {
         cashierService = new CashierServiceImpl();
         CustomerServiceImpl customerService = new CustomerServiceImpl();
         CartServiceImpl cartService = new CartServiceImpl();
-        TestProductImplDB productImplDB = new TestProductImplDB();
-        var storeProducts = new StoreDBImpl().getStoreProducts(productImplDB.getProductDB());
+        productImplDB = new TestProductImplDB();
+        Store storeProducts = new StoreDBImpl().getStoreProducts(productImplDB.getProductDB());
         carts = new CartList().getCarts(customerService, cartService, storeProducts);
         cashier = new Cashier("Ikechi", "Male", 40, 23);
+        customers = new CustomersList().getCustomers();
     }
 
     @Test
@@ -157,5 +162,23 @@ class CashierServiceImplThreadTest {
         Assertions.assertEquals(5, result.getMapProductQtySold().get("Milk"));
         Assertions.assertEquals(5, result.getMapProductQtySold().get("Milk"));
         Assertions.assertEquals(11, result.getCustomerName().size());
+    }
+
+    @Test
+    void newAsyncSellThread() {
+        Store storeProducts =  new StoreDBImpl().getStoreProducts(productImplDB.getProductDB());
+        var result = cashierService.newAsyncSellThread(cashier, customers, storeProducts);
+        for(Customer customer : result) {
+            System.out.println(customer);
+        }
+    }
+
+    @Test
+    void newNonAsyncSellThread() {
+        Store storeProducts = new StoreDBImpl().getStoreProducts(productImplDB.getProductDB());
+        var result = cashierService.newAsyncSellThread(cashier, customers, storeProducts);
+        for(Customer customer : result) {
+            System.out.println(customer);
+        }
     }
 }

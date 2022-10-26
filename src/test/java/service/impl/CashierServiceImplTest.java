@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.TestProductImplDB;
-import utils.CartList;
 import utils.CartPriorityComparator;
 
 import java.util.*;
@@ -34,28 +33,28 @@ class CashierServiceImplTest {
         cashier = new Cashier("Ikechi", "Male", 40, 23);
 
         customer1 = new Customer("Kendrick", "Female", 19, 200000.0);
-        customerService.buy(customer1, "Rice", storeProducts, 2);
-        customerService.buy(customer1, "Salmon", storeProducts, 7);
-        customerService.buy(customer1, "Spaghetti", storeProducts, 1);
+        customerService.oldBuy(customer1, "Rice", storeProducts, 2);
+        customerService.oldBuy(customer1, "Salmon", storeProducts, 7);
+        customerService.oldBuy(customer1, "Spaghetti", storeProducts, 1);
         Cart customer1Cart = cartService.createCart(customer1.getProductBoughtList(), customer1.getId(), customer1.getName());
         priorityQueue.add(customer1Cart);
         normalQueue.add(customer1Cart);
 
         customer2 = new Customer("Yinka", "Male", 29, 400000.0);
-        customerService.buy(customer2, "Rice", storeProducts, 5);
-        customerService.buy(customer2, "Beans", storeProducts, 8);
-        customerService.buy(customer2, "Spaghetti", storeProducts, 1);
-        customerService.buy(customer2, "Chicken", storeProducts, 2);
-        customerService.buy(customer2, "Coke", storeProducts, 2);
+        customerService.oldBuy(customer2, "Rice", storeProducts, 5);
+        customerService.oldBuy(customer2, "Beans", storeProducts, 8);
+        customerService.oldBuy(customer2, "Spaghetti", storeProducts, 1);
+        customerService.oldBuy(customer2, "Chicken", storeProducts, 2);
+        customerService.oldBuy(customer2, "Coke", storeProducts, 2);
         Cart customer2Cart = cartService.createCart(customer2.getProductBoughtList(), customer2.getId(), customer2.getName());
         priorityQueue.add(customer2Cart);
         normalQueue.add(customer2Cart);
 
         customer3 = new Customer("Michael", "Male", 35, 900000.0);
-        customerService.buy(customer3, "Detergent", storeProducts, 1);
-        customerService.buy(customer3, "Toothpaste", storeProducts, 1);
-        customerService.buy(customer3, "Chips", storeProducts, 1);
-        customerService.buy(customer3, "Grapes", storeProducts, 1);
+        customerService.oldBuy(customer3, "Detergent", storeProducts, 1);
+        customerService.oldBuy(customer3, "Toothpaste", storeProducts, 1);
+        customerService.oldBuy(customer3, "Chips", storeProducts, 1);
+        customerService.oldBuy(customer3, "Grapes", storeProducts, 1);
         Cart customer3Cart = cartService.createCart(customer3.getProductBoughtList(), customer3.getId(), customer3.getName());
         priorityQueue.add(customer3Cart);
         normalQueue.add(customer3Cart);

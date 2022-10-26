@@ -20,9 +20,9 @@ class CartServiceImplTest {
         cartService = new CartServiceImpl();
         customerService = new CustomerServiceImpl();
         customer = new Customer("Henry", "Male", 43, 20000.0);
-        customerService.buy(customer, "Rice", storeProducts, 2);
-        customerService.buy(customer, "Beans", storeProducts, 2);
-        customerService.buy(customer, "Chicken", storeProducts, 2);
+        customerService.oldBuy(customer, "Rice", storeProducts, 2);
+        customerService.oldBuy(customer, "Beans", storeProducts, 2);
+        customerService.oldBuy(customer, "Chicken", storeProducts, 2);
     }
 
 

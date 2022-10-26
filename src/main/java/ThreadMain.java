@@ -1,6 +1,7 @@
 import model.*;
 import service.impl.*;
 import utils.CartList;
+import utils.CustomersList;
 import utils.Docs;
 
 import java.io.File;
@@ -29,6 +30,11 @@ public class ThreadMain {
 
         var result = cashierService.asyncSell(cashier, carts);
         System.out.println(result);
+
+        List<Customer> customers = new CustomersList().getCustomers();
+        var res = customerService.newBuyAsyncThread(customers, storeProducts);
+        System.out.println(res);
+
     }
 
 }

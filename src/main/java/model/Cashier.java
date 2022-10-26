@@ -7,12 +7,17 @@ import java.util.concurrent.atomic.LongAdder;
 public class Cashier extends Staff { //Inheritance Staff Class
 
     private String receipt;
-    private final Collection<String> customerNames = Collections.synchronizedCollection(new ArrayList<>());
+//    private final Collection<String> customerNames = Collections.synchronizedCollection(new ArrayList<>());
+    private final Collection<String> customerNames = new ArrayList<>();
     private final Set<String> productsSold = Collections.synchronizedSet(new HashSet<>());
-    private final Map<String, Integer> productsSoldMap = Collections.synchronizedMap(new HashMap<>());
+//    private final Map<String, Integer> productsSoldMap = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Integer> productsSoldMap = new HashMap<>();
     private final Object productSoldMapObjectLock = new Object();
     private final LongAdder totalQuantities = new LongAdder();
-    private final AtomicInteger totalSales = new AtomicInteger();
+//    private final AtomicInteger totalSales = new AtomicInteger();
+    private int totalSales;
+    private Customer customer;
+
     private int specificProductTotal;
     private final Object totalQtiesObjectLock = new Object();
 
@@ -69,16 +74,24 @@ public class Cashier extends Staff { //Inheritance Staff Class
         this.totalQuantities.add(qty);
     }
 
-    public Integer getTotalSales() {
-        return totalSales.get();
+//    public Integer getTotalSales() {
+//        return totalSales.get();
+//    }
+
+    public int getTotalSales() {
+        return totalSales;
     }
 
-    public void setTotalSales() {
-        totalSales.set(0);
-    }
+//    public void setTotalSales() {
+//        totalSales.set(0);
+//    }
+
+//    public void addTotalSale(int amount) {
+//        totalSales.getAndAdd(amount);
+//    }
 
     public void addTotalSale(int amount) {
-        totalSales.getAndAdd(amount);
+        totalSales += amount;
     }
 
     public int getSpecificProductTotal() {
@@ -101,4 +114,11 @@ public class Cashier extends Staff { //Inheritance Staff Class
         this.sales = sales;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }

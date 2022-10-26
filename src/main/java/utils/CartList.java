@@ -76,17 +76,17 @@ public class CartList {
         customerProductList10.put("Strawberries", 3);
         customerProductList10.put("Blueberries", 10);
 
-        customerService.buy(customer, customerProductList, storeProducts);
-        customerService.buy(customer1, customerProductList1, storeProducts);
-        customerService.buy(customer2, customerProductList2, storeProducts);
-        customerService.buy(customer3, customerProductList3, storeProducts);
-        customerService.buy(customer4, customerProductList4, storeProducts);
-        customerService.buy(customer5, customerProductList5, storeProducts);
-        customerService.buy(customer6, customerProductList6, storeProducts);
-        customerService.buy(customer7, customerProductList7, storeProducts);
-        customerService.buy(customer8, customerProductList8, storeProducts);
-        customerService.buy(customer9, customerProductList9, storeProducts);
-        customerService.buy(customer10, customerProductList10, storeProducts);
+        customerService.oldBuy(customer, customerProductList, storeProducts);
+        customerService.oldBuy(customer1, customerProductList1, storeProducts);
+        customerService.oldBuy(customer2, customerProductList2, storeProducts);
+        customerService.oldBuy(customer3, customerProductList3, storeProducts);
+        customerService.oldBuy(customer4, customerProductList4, storeProducts);
+        customerService.oldBuy(customer5, customerProductList5, storeProducts);
+        customerService.oldBuy(customer6, customerProductList6, storeProducts);
+        customerService.oldBuy(customer7, customerProductList7, storeProducts);
+        customerService.oldBuy(customer8, customerProductList8, storeProducts);
+        customerService.oldBuy(customer9, customerProductList9, storeProducts);
+        customerService.oldBuy(customer10, customerProductList10, storeProducts);
 
         Cart customerCart = cart.createCart(customer.getProductBoughtList(), customer.getId(), customer.getName());
         Cart customerCart1 = cart.createCart(customer1.getProductBoughtList(), customer1.getId(), customer1.getName());

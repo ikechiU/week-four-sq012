@@ -45,15 +45,15 @@ public class Main {
         Cashier cashier2 = managerService.hireCashier(applicant1, manager);
 
         //First Customer Buy Product
-        String customerBuyResult = customerService.buy(customer, "RICE", storeProducts, 16);
+        String customerBuyResult = customerService.oldBuy(customer, "RICE", storeProducts, 16);
         System.out.println(customerBuyResult);
-        String customerBuyResult2 = customerService.buy(customer, "BEANS", storeProducts, 4);
+        String customerBuyResult2 = customerService.oldBuy(customer, "BEANS", storeProducts, 4);
         System.out.println(customerBuyResult2);
         //Second Customer Buy Product
-        String customer1BuyResult = customerService.buy(customer1, "RICE", 2022, storeProducts, 3);
+        String customer1BuyResult = customerService.oldBuy(customer1, "RICE", 2022, storeProducts, 3);
         System.out.println(customer1BuyResult);
         //Third Customer Buy Product
-        String customer3BuyResult = customerService.buy(customer3, "Cod", 2022, storeProducts, 1);
+        String customer3BuyResult = customerService.oldBuy(customer3, "Cod", 2022, storeProducts, 1);
         System.out.println(customer3BuyResult);
 
 
@@ -84,12 +84,12 @@ public class Main {
     }
 
     public static void buyExceptions1(CustomerServiceImpl customerService, Customer customer2, Store storeProducts) {
-        String customer2BuyResult = customerService.buy(customer2, "beankS", storeProducts, 1);
+        String customer2BuyResult = customerService.oldBuy(customer2, "beankS", storeProducts, 1);
         System.out.println(customer2BuyResult);
     }
 
     public static void buyExceptions2(CustomerServiceImpl customerService, Customer customer4, Store storeProducts) {
-        String customer4BuyResult = customerService.buy(customer4, "bEaNs", 2025, storeProducts, 2);
+        String customer4BuyResult = customerService.oldBuy(customer4, "bEaNs", 2025, storeProducts, 2);
         System.out.println(customer4BuyResult);
     }
 }

@@ -11,6 +11,8 @@ public interface CashierService {
     Collection<String> asyncGetCustomerNames(Cashier cashier, List<Cart> carts);
     Set<String> asyncGetProductsSold(Cashier cashier, List<Cart> carts);
     Map<String, Integer> asyncGetMapOfProductsSold(Cashier cashier, List<Cart> carts);
+    List<Customer> newAsyncSellThread(Cashier cashier, List<Customer> customers, Store storeProducts);
+    List<Customer> newNonAsyncSellThread(Cashier cashier, List<Customer> customers, Store storeProducts);
     Sales asyncSell(Cashier cashier, List<Cart> carts);
     Sales nonAsyncSell(Cashier cashier, List<Cart> carts);
     Sales nonAsyncExecutorsSell(Cashier cashier, List<Cart> carts);

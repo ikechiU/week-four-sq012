@@ -10,9 +10,12 @@ import java.util.concurrent.Executors;
 
 public class CashierServiceImpl implements CashierService {
 
+    private static final Object monitorLock = new Object();
+    private static final Object newMonitorLock = new Object();
     private static int receipt = 1000;
     private static final int priorityReceipt = 110984235;
     private static final int normalQueueReceipt = 120984235;
+    private final CustomerServiceImpl customerService = new CustomerServiceImpl();
 
     @Override
     public Integer asyncGetQuantitiesOfOneProductSold(Cashier cashier, List<Cart> carts, String specificProductName) {
@@ -125,6 +128,105 @@ public class CashierServiceImpl implements CashierService {
             throw new RuntimeException(e);
         }
     }
+
+    private List<Customer> getCustomersInCashierPOS(List<Customer> customers, Store storeProducts) {
+        return customerService.newBuyAsyncThread(customers, storeProducts);
+    }
+
+    @Override
+    public List<Customer> newAsyncSellThread(Cashier cashier, List<Customer> customers, Store storeProducts) {
+        var updatedCustomers = getCustomersInCashierPOS(customers, storeProducts);
+        synchronized (newMonitorLock) {
+            List<Customer> customersOrderSettled = new ArrayList<>();
+
+            for(Customer customer: updatedCustomers) {
+                var future = CompletableFuture.supplyAsync(() -> newSell(cashier, customer));
+                try {
+                    customersOrderSettled.add(future.get());
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+//                var future = CompletableFuture.supplyAsync(() -> {
+//                    newSell(cashier, customer);
+//                    return customer;
+//                });
+//                try {
+//                    customersOrderSettled.add(future.get());
+//                } catch (InterruptedException | ExecutionException e) {
+//                    e.printStackTrace();
+//                }
+            }
+
+            return customersOrderSettled;
+        }
+    }
+
+    @Override
+    public List<Customer> newNonAsyncSellThread(Cashier cashier, List<Customer> customers, Store storeProducts) {
+        var updatedCustomers = getCustomersInCashierPOS(customers, storeProducts);
+        List<Thread> threads = new ArrayList<>();
+        for(Customer customer: updatedCustomers) {
+            Thread thread = new Thread(new NonAsync2(cashier, customer));
+            threads.add(thread);
+            thread.start();
+        }
+
+        for(var thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return updatedCustomers;
+
+//        synchronized (newMonitorLock) {
+//            List<Thread> threads = new ArrayList<>();
+//            for(Customer customer: updatedCustomers) {
+//                Thread thread = new Thread(new NonAsync2(cashier, customer));
+//                threads.add(thread);
+//                thread.start();
+//            }
+//
+//            for(var thread : threads) {
+//                try {
+//                    thread.join();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            return updatedCustomers;
+//        }
+    }
+
+    private Customer newSell(Cashier cashier, Customer customer) {
+        for (Map.Entry<String, String> map: customer.getCartStatus().entrySet()) {
+            var productName = map.getKey();
+            var status = map.getValue();
+
+            var ch  = status.charAt(0);
+            if (Character.isDigit(ch)) {
+                customer.addToPurchase(productName, Integer.parseInt(status));
+            }
+        }
+        cashier.setCustomer(customer);
+        return cashier.getCustomer();
+    }
+
+//    private void newSell(Cashier cashier, Customer customer) {
+//        for (Map.Entry<String, String> map: customer.getCartStatus().entrySet()) {
+//            var productName = map.getKey();
+//            var status = map.getValue();
+//
+//            var ch  = status.charAt(0);
+//            if (Character.isDigit(ch)) {
+//                customer.addToPurchase(productName, Integer.parseInt(status));
+//            }
+//        }
+//    }
 
     @Override
     public Sales asyncSell(Cashier cashier, List<Cart> carts) {
@@ -255,20 +357,23 @@ public class CashierServiceImpl implements CashierService {
         return stringBuilder.toString();
     }
 
-    private static void sellingPerCart(Cashier cashier, Cart cart) {
-        cashier.addCustomerName(cart.getCustomerName());
-        cashier.addTotalSale(cart.getTotalAmount());
-        cashier.addTotalQuantities(cart.getTotalQty());
+    private static synchronized void sellingPerCart(Cashier cashier, Cart cart) {
+        synchronized (monitorLock) {
+            cashier.addCustomerName(cart.getCustomerName());
+            cashier.addTotalSale(cart.getTotalAmount());
+            cashier.addTotalQuantities(cart.getTotalQty());
 
-        for (ProductBought productBought: cart.getProductBoughtList()) {
-            var productName = productBought.getProductName();
-            var map = cashier.getProductsSoldMap();
-            int count = 0;
-            if (map.containsKey(productName)) {
-                count = map.get(productName);
+            for (ProductBought productBought : cart.getProductBoughtList()) {
+                var productName = productBought.getProductName();
+                System.out.println(productName);
+                var map = cashier.getProductsSoldMap();
+                int count = 0;
+                if (map.containsKey(productName)) {
+                    count = map.get(productName);
+                }
+                cashier.addProductsSoldMap(productName, count + productBought.getQuantity());
+                cashier.addProductsSold(productBought.getProductName());
             }
-            cashier.addProductsSoldMap(productName, count + productBought.getQuantity());
-            cashier.addProductsSold(productBought.getProductName());
         }
     }
 
@@ -285,7 +390,20 @@ public class CashierServiceImpl implements CashierService {
             sellingPerCart(cashier, cart);
             new CashierServiceImpl().issueReceipt(cashier, cart);
         }
+    }
 
+    public static class NonAsync2 implements Runnable{
+        private final Cashier cashier;
+        private final Customer customer;
+        public NonAsync2 (Cashier cashier, Customer customer) {
+            this.cashier = cashier;
+            this.customer = customer;
+        }
 
+        @Override
+        public void run() {
+//            sellingPerCart(cashier, cart);
+            new CashierServiceImpl().newSell(cashier, customer);
+        }
     }
 }

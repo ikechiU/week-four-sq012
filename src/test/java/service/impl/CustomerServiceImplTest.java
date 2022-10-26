@@ -46,8 +46,8 @@ class CustomerServiceImplTest {
 
     @Test
     void buyProduct() {
-        String result = customerService.buy(customer, "BeAnS", storeProducts, 1);
-        String result1 = customerService.buy(customer2, "rIcE", storeProducts, 1);
+        String result = customerService.oldBuy(customer, "BeAnS", storeProducts, 1);
+        String result1 = customerService.oldBuy(customer2, "rIcE", storeProducts, 1);
 
         assertEquals(result, "Hello cashier, I will like to buy " + customer.getProductName() + ".");
         assertEquals(result1, "Hello cashier, I will like to buy " + customer2.getProductName() + ".");
@@ -55,25 +55,25 @@ class CustomerServiceImplTest {
 
     @Test
     void buyProducts() {
-        var result = customerService.buy(customer, customerProductList2, storeProducts);
-        var result2 = customerService.buy(customer2, customerProductList3, storeProducts);
+        var result = customerService.oldBuy(customer, customerProductList2, storeProducts);
+        var result2 = customerService.oldBuy(customer2, customerProductList3, storeProducts);
 
-        assertNull(customerService.buy(new Customer(), customerProductList, storeProducts));
+        assertNull(customerService.oldBuy(new Customer(), customerProductList, storeProducts));
         assertEquals("Hello cashier, I will like to buy 4 products.", result);
         assertEquals("Hello cashier, I will like to buy 1 product.", result2);
     }
 
     @Test
     void buyProductWithManufactureYear() {
-        String result = customerService.buy(customer, "BeAnS", 2022, storeProducts, 1);
+        String result = customerService.oldBuy(customer, "BeAnS", 2022, storeProducts, 1);
         assertEquals(result,
                 "Hello cashier, I will like to buy " + customer.getProductName() + ". That was manufactured in " + customer.getProductYear() +".");
     }
 
     @Test
     void updateCustomerDetails() {
-        customerService.buy(customer, "BeAnS", storeProducts, 1);
-        customerService.buy(customer2, "rIcE", storeProducts, 1);
+        customerService.oldBuy(customer, "BeAnS", storeProducts, 1);
+        customerService.oldBuy(customer2, "rIcE", storeProducts, 1);
 
         var newCustomerBalance = customer.getWalletBalance();
         var newCustomer2Balance = customer2.getWalletBalance();
@@ -85,8 +85,8 @@ class CustomerServiceImplTest {
 
     @Test
     void updateStoreProducts() {
-        customerService.buy(customer, "BeAnS", storeProducts, 1);
-        customerService.buy(customer2, "rIcE", storeProducts, 1);
+        customerService.oldBuy(customer, "BeAnS", storeProducts, 1);
+        customerService.oldBuy(customer2, "rIcE", storeProducts, 1);
 
         var riceStockQty = storeProducts.getProducts().get(0).getQuantity();
         var beansStockQty = storeProducts.getProducts().get(0).getQuantity();
@@ -97,8 +97,8 @@ class CustomerServiceImplTest {
 
     @Test
     void updateProductBoughtList() {
-        customerService.buy(customer2, "BeAnS", storeProducts, 1);
-        customerService.buy(customer2, "rIcE", storeProducts, 1);
+        customerService.oldBuy(customer2, "BeAnS", storeProducts, 1);
+        customerService.oldBuy(customer2, "rIcE", storeProducts, 1);
 
         var list = customer2.getProductBoughtList();
         assertEquals(list.size(), 2);
@@ -107,7 +107,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductInsufficientFundTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                customerService.buy(customer, "rice", storeProducts, 5),
+                customerService.oldBuy(customer, "rice", storeProducts, 5),
                 ErrorMessages.INSUFFICIENT_BALANCE.name());
         assertTrue(thrown.getMessage().contains("Insufficient balance."));
     }
@@ -116,7 +116,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductYearExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                customerService.buy(customer2, "rIcE", 2033, storeProducts, 1),
+                customerService.oldBuy(customer2, "rIcE", 2033, storeProducts, 1),
                 ErrorMessages.MANUFACTURE_YEAR_LESS.name());
 
         assertTrue(thrown.getMessage().contains("Product manufacture year lesser than your request."));
@@ -125,7 +125,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductOutOfStockExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                        customerService.buy(customer2, "Fanta", 2022, storeProducts, 1),
+                        customerService.oldBuy(customer2, "Fanta", 2022, storeProducts, 1),
                 ErrorMessages.OUT_OF_STOCK.name());
 
         assertTrue(thrown.getMessage().contains("Product out of stock."));
@@ -134,7 +134,7 @@ class CustomerServiceImplTest {
     @Test
     void buyProductNotAvailableExceptionTesting() {
         ProductServiceException thrown = assertThrows(ProductServiceException.class, ()->
-                        customerService.buy(customer2, "Suya", 2022, storeProducts, 1),
+                        customerService.oldBuy(customer2, "Suya", 2022, storeProducts, 1),
                 ErrorMessages.PRODUCT_NOT_AVAILABLE.name());
 
         assertTrue(thrown.getMessage().contains("Product not available."));
